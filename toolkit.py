@@ -1,5 +1,8 @@
 import datetime
+import smtplib
 import time
+from email.header import Header
+from email.mime.text import MIMEText
 
 import xlrd as xlrd
 from chinese_calendar import is_workday
@@ -78,3 +81,14 @@ def get_excel_data(path, sheet_name):
             data[key] = row_data[index]
         data_list.append(data)
     return data_list
+
+
+def send_mail(from_addr, password, to_addrs: list, subject, text):
+    msg = MIMEText(text, 'plain', 'utf-8')
+    msg['From'] = Header(from_addr)
+    msg['TO'] = Header(",".join(to_addrs))
+    msg['Subject'] = Header(subject)
+    server = smtplib.SMTP_SSL("smtp.exmail.qq.com", 465)
+    server.login(from_addr, password)
+    server.sendmail(from_addr, to_addrs, msg.as_string())
+    server.quit()
